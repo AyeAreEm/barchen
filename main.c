@@ -23,11 +23,6 @@ typedef struct State {
     int height;
 } State;
 
-void copy_to_clip() {
-    char *command = "python3 copy_translation.py";
-    system(command);
-}
-
 char *translate(string str) {
     char *command = "python3 translator.py";
     char *cstr = string_to_cstr(str);
@@ -50,26 +45,21 @@ char *translate(string str) {
     string content = string_new();
     char c;
     while ((c = fgetc(file)) != EOF) {
-        printf("num: %d\n", c);
-
         switch (c) {
             case Umlaut_Small_ah: {
                 string tmp = string_from("ä");
                 string_pushstr(&content, &tmp);
                 free(tmp.data);
-                string_print(content);
                 continue;        
             }
             case Umlaut_Small_uh: {
                 string tmp = string_from("ü");
                 string_pushstr(&content, &tmp);
                 free(tmp.data);
-                string_print(content);
                 continue;
             }
             default: {
                 string_push(&content, c);
-                string_print(content);
             }
         }
     }
@@ -104,7 +94,7 @@ void update(State *state) {
             *state->output.active = false;
         }
     } else if (CheckCollisionPointRec(mouse_pos, state->output.box)) {
-        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             *state->output.active = true;
             *state->input.active = false;
@@ -130,16 +120,12 @@ void update(State *state) {
         if (IsKeyPressed(KEY_BACKSPACE) && state->input.content->len > 0) {
             string_pop(state->input.content);
         }
-    } else if (*state->output.active) {
-        copy_to_clip();
-        *state->output.active = false;
     }
 }
 
 void draw(State state) {
     char *input_cstr = string_to_cstr(*state.input.content);
     char *output_cstr = string_to_cstr(*state.output.content);
-    // printf("output: %s\n", output_cstr);
     BeginDrawing();
 
     ClearBackground((Color){28, 27, 25, 255 });
