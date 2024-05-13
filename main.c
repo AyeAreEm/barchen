@@ -4,11 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef enum Umlaut {
-    Umlaut_Small_ah = -28,
-    Umlaut_Small_uh = -4,
-} Umlaut;
-
 typedef struct Textbox {
     Rectangle box;
     string *content;
@@ -45,23 +40,7 @@ char *translate(string str) {
     string content = string_new();
     char c;
     while ((c = fgetc(file)) != EOF) {
-        switch (c) {
-            case Umlaut_Small_ah: {
-                string tmp = string_from("ä");
-                string_pushstr(&content, &tmp);
-                free(tmp.data);
-                continue;        
-            }
-            case Umlaut_Small_uh: {
-                string tmp = string_from("ü");
-                string_pushstr(&content, &tmp);
-                free(tmp.data);
-                continue;
-            }
-            default: {
-                string_push(&content, c);
-            }
-        }
+        string_push(&content, c);
     }
     fclose(file);
 
@@ -126,6 +105,7 @@ void update(State *state) {
 void draw(State state) {
     char *input_cstr = string_to_cstr(*state.input.content);
     char *output_cstr = string_to_cstr(*state.output.content);
+
     BeginDrawing();
 
     ClearBackground((Color){28, 27, 25, 255 });
